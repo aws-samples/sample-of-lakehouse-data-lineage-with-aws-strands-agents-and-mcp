@@ -11,9 +11,54 @@ Data Lakehouse数据血缘分析系统是一个基于AWS Neptune图数据库的�
 - **自然语言输出**: 结构化的专业分析报告，非代码输出
 - **实时监控**: 工具调用状态和性能统计
 
-## 🚀 快速启动
+## 📋 前提条件和数据准备
 
 ### 环境要求
+- **操作系统**: Amazon Linux 2023 (推荐)
+- **Python版本**: 3.10+ (必需)
+- **Neptune实例**: db.r5.large+ (必需)
+- **网络**: VPC内访问Neptune
+
+### 数据血缘准备
+
+在使用本系统之前，您需要先准备数据血缘信息并写入Neptune图数据库。可以参考以下AWS官方资源：
+
+#### 📚 参考资料
+
+1. **[在基于 Amazon 云平台的湖仓一体架构上构建数据血缘的探索和实践](https://aws.amazon.com/cn/blogs/china/exploration-and-practice-of-building-data-lineage-on-the-integrated-lake-warehouse-architecture-based-on-aws/)**
+   - 详细介绍如何在AWS湖仓一体架构中构建端到端的数据血缘系统
+
+2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
+   - 使用Amazon Athena、Redshift、Neptune和dbt构建复杂查询的数据血缘
+
+#### 🔧 数据准备步骤
+
+1. **设计图模式**
+   - 定义顶点类型：数据源、数据集、转换任务、输出表等
+   - 定义边类型：数据流向、依赖关系、转换关系等
+
+2. **数据采集**
+   - 从ETL工具中提取血缘信息
+   - 解析SQL查询获取表级和列级依赖
+   - 收集数据处理作业的输入输出关系
+
+3. **写入Neptune**
+   - 使用Gremlin或SPARQL将血缘数据写入Neptune
+   - 建立适当的索引以优化查询性能
+   - 验证数据完整性和关系正确性
+
+#### ⚠️ 重要提示
+
+本系统是数据血缘的**分析和可视化工具**，不包含数据血缘的采集和写入功能。在使用前，请确保：
+
+- ✅ Neptune实例已创建并配置
+- ✅ 血缘数据已按图模式写入Neptune
+- ✅ 网络连接和权限已正确配置
+- ✅ 测试查询可以正常返回血缘关系
+
+## 🚀 快速启动
+
+### 系统要求
 - **操作系统**: Amazon Linux 2023 (推荐)
 - **Python版本**: 3.10+ (必需)
 - **Neptune实例**: db.r5.large+ (必需)
