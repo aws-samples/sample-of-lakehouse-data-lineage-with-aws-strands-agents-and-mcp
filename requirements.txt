@@ -1,0 +1,11 @@
+# Python 3.10+ required for MCP
+streamlit>=1.32.0
+mcp>=0.4.0
+strands-agents>=0.1.0
+awslabs-amazon-neptune-mcp-server>=0.1.0
+boto3>=1.34.0
+pandas>=2.1.4
+plotly>=5.17.0
+networkx>=3.2.1
+python-dotenv>=1.0.0
+aiofiles>=23.0.0
