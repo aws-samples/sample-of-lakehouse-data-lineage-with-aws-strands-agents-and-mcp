@@ -84,8 +84,8 @@ sudo yum install git -y
 #### 步骤2: 项目部署
 ```bash
 # 克隆项目
-git clone https://github.com/YOUR_USERNAME/lakehouse-data-lineage-with-aws-strands-agents-and-mcp.git
-cd lakehouse-data-lineage-with-aws-strands-agents-and-mcp
+git clone https://github.com/aws-samples/sample-of-lakehouse-data-lineage-with-aws-strands-agents-and-mcp.git
+cd sample-of-lakehouse-data-lineage-with-aws-strands-agents-and-mcp
 
 # 创建虚拟环境
 python3.11 -m venv venv
