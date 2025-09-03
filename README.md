@@ -11,9 +11,54 @@ The Data Lakehouse lineage analysis system is a data lineage analysis tool based
 - **Natural Language Output**: Structured professional analysis reports, non-code output
 - **Real-time Monitoring**: Tool call status and performance statistics
 
+## 📋 Prerequisites and Data Preparation
+
+### System Requirements
+- **Operating System**: Amazon Linux 2023 (Recommended)
+- **Python Version**: 3.10+ (Required)
+- **Neptune Instance**: db.r5.large+ (Required)
+- **Network**: VPC access to Neptune
+
+### Data Lineage Preparation
+
+Before using this system, you need to prepare data lineage information and write it to the Neptune graph database. Please refer to the following official AWS resources:
+
+#### 📚 Reference Materials
+
+1. **[Exploration and Practice of Building Data Lineage on the Integrated Lake-Warehouse Architecture Based on AWS](https://aws.amazon.com/cn/blogs/china/exploration-and-practice-of-building-data-lineage-on-the-integrated-lake-warehouse-architecture-based-on-aws/)**
+   - Detailed introduction on how to build end-to-end data lineage systems in AWS lakehouse architecture
+
+2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
+   - Building data lineage for complex queries using Amazon Athena, Redshift, Neptune, and dbt
+
+#### 🔧 Data Preparation Steps
+
+1. **Design Graph Schema**
+   - Define vertex types: data sources, datasets, transformation tasks, output tables, etc.
+   - Define edge types: data flow, dependency relationships, transformation relationships, etc.
+
+2. **Data Collection**
+   - Extract lineage information from ETL tools
+   - Parse SQL queries to obtain table-level and column-level dependencies
+   - Collect input-output relationships of data processing jobs
+
+3. **Write to Neptune**
+   - Use Gremlin or SPARQL to write lineage data to Neptune
+   - Establish appropriate indexes to optimize query performance
+   - Validate data integrity and relationship correctness
+
+#### ⚠️ Important Notice
+
+This system is a **data lineage analysis and visualization tool** and does not include data lineage collection and ingestion functionality. Before use, please ensure:
+
+- ✅ Neptune instance is created and configured
+- ✅ Lineage data is written to Neptune according to graph schema
+- ✅ Network connections and permissions are properly configured
+- ✅ Test queries can return lineage relationships normally
+
 ## 🚀 Quick Start
 
-### Requirements
+### Installation Requirements
 - **Operating System**: Amazon Linux 2023 (Recommended)
 - **Python Version**: 3.10+ (Required)
 - **Neptune Instance**: db.r5.large+ (Required)
