@@ -61,9 +61,9 @@ vi .env
 
 **Environment Configuration (.env file)**:
 ```bash
-NEPTUNE_ENDPOINT=neptune-db://your-cluster.cluster-xxxxxx.us-east-1.neptune.amazonaws.com
-AWS_REGION=us-east-1
-AWS_DEFAULT_REGION=us-east-1
+NEPTUNE_ENDPOINT=neptune-db://your-cluster.cluster-xxxxxx.us-west-2.neptune.amazonaws.com
+AWS_REGION=us-west-2
+AWS_DEFAULT_REGION=us-west-2
 RAW_DATA_PATH=./raw-data
 ```
 
@@ -76,11 +76,55 @@ source .env
 # Run data processing script
 python3 process_lineage.py
 
-# Verify data ingestion
-python3 -c "from gremlin_python.driver import client; from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection; import os; conn = DriverRemoteConnection(f'wss://{os.getenv('NEPTUNE_ENDPOINT')}:8182/gremlin', 'g'); g = client.Client(conn, 'g'); print('Vertices:', g.V().count().next()); print('Edges:', g.E().count().next()); conn.close()"
-```
 
 ### Step 5: Start Application
+
+#### 5.1 Prerequisites Check
+**Before starting the application, ensure:**
+
+1. **Security Group Configuration**:
+   ```bash
+   # Verify port 8501 is open in EC2 security group
+   # Add inbound rule: Type=Custom TCP, Port=8501, Source=0.0.0.0/0 (or your IP range)
+   ```
+
+2. **IAM Permissions** (Minimum Required):
+   ```json
+   {
+       "Version": "2012-10-17",
+       "Statement": [
+           {
+               "Effect": "Allow",
+               "Action": [
+                   "bedrock:InvokeModel",
+                   "bedrock:InvokeModelWithResponseStream"
+               ],
+               "Resource": "arn:aws:bedrock:us-west-2::foundation-model/us.anthropic.claude-sonnet-4-20250514-v1:0"
+           },
+           {
+               "Effect": "Allow",
+               "Action": [
+                   "neptune-db:ReadDataViaQuery",
+                   "neptune-db:QueryStatus",
+                   "neptune-db:GetQueryStatus"
+               ],
+               "Resource": "arn:aws:neptune-db:YOUR-REGION:ACCOUNT-ID:cluster/YOUR-NEPTUNE-CLUSTER/*"
+           }
+       ]
+   }
+   ```
+   
+   **Replace the following placeholders:**
+   - `ACCOUNT-ID`: Your AWS account ID
+   - `YOUR-NEPTUNE-CLUSTER`: Your Neptune cluster identifier
+   - `YOUR-REGION`: Your Neptune cluster region (e.g., us-east-1)
+   
+   **📍 Important Notes:**
+   - Claude Sonnet 4 model is only available in `us-west-2` region
+   - Neptune cluster can be in any region where you deployed it
+   - Cross-region access: Bedrock calls go to `us-west-2`, Neptune calls go to your cluster region
+
+#### 5.2 Start Application
 ```bash
 # Ensure virtual environment is activated
 source venv/bin/activate
@@ -88,6 +132,11 @@ source venv/bin/activate
 # Start Streamlit application
 streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
 ```
+
+**⚠️ Important Notes:**
+- Ensure EC2 security group allows inbound traffic on port 8501
+- Verify EC2 instance has IAM role with Bedrock Claude access permissions
+- Check that `bedrock:InvokeModelWithResponseStream` permission is granted
 
 ### Step 6: Access and Use System
 1. Open browser and navigate to `http://your-server-ip:8501`
@@ -113,7 +162,7 @@ streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
 
 ## 📊 Usage Scenarios
 
-### 🔍 New User Onboarding
+### 1. 🔍 New User Onboarding
 ```
 System Prompt: Data Lineage Expert
 Analysis Instruction: Connection Status Check
@@ -121,21 +170,56 @@ Expected Output: Neptune connection status and basic information
 Execution Time: 5-10 seconds
 ```
 
-### 📊 Data Source Inventory
-```
-System Prompt: S3 Data Source Expert
-Analysis Instruction: Data Source Statistics
-Expected Output: Data source count and type statistics
-Execution Time: 15-25 seconds
-```
-
-### 🔄 Lineage Relationship Analysis
+### 2. 📈 Data Source Statistical Analysis
 ```
 System Prompt: Data Lineage Expert
-Analysis Instruction: Simple Lineage Analysis
-Expected Output: Main data flow relationship analysis
-Execution Time: 20-35 seconds
+Analysis Instruction: Count and categorize data sources in the graph
+Expected Output: 
+- Total data source statistics
+- Data source distribution by type
+- Data source connectivity analysis
+Execution Time: 30-40 seconds
 ```
+
+### 3. 🔄 Complete Lineage Path Analysis
+```
+System Prompt: Data Lineage Expert
+Analysis Instruction: Analyze complete data flow paths, identify key data hub nodes, and trace the complete path from raw data to final analysis results
+Expected Output:
+- End-to-end data flow path diagram
+- Key data hub node identification
+- Data transformation node analysis
+- Complete data lineage chain paths
+Execution Time: 40-60 seconds
+```
+
+### 4. ⚠️ Impact Scope Assessment
+```
+System Prompt: Data Impact Expert
+Analysis Instruction: Assess the impact scope of core data sources. Analyze which downstream systems would be affected if title_basics node changes?
+Execution Time: 45-60 seconds
+```
+
+
+## 💡 Usage Tips
+
+### 📝 Best Practices
+1. **Query Optimization**: Use specific node names and field names for more accurate results
+2. **Step-by-step Analysis**: For complex scenarios, start with basic analysis then dive into specific issues
+3. **Template Combination**: Combine different expert templates for multi-perspective analysis
+4. **Result Validation**: Validate important analysis results through multiple queries
+
+### 🎯 Query Example Templates
+- **Node Query**: "Analyze all properties and connections of [node-name]"
+- **Path Tracing**: "Trace the complete data flow path from [source-node] to [target-node]"
+- **Impact Analysis**: "If [node/field] changes, which downstream systems would be affected?"
+- **Statistical Analysis**: "Count and analyze the distribution of [type] nodes" through multiple queries
+
+### 🎯 Query Example Templates
+- **Node Query**: "Analyze all properties and connections of [node-name]"
+- **Path Tracing**: "Trace the complete data flow path from [source-node] to [target-node]"
+- **Impact Analysis**: "If [node/field] changes, which downstream systems would be affected?"
+- **Statistical Analysis**: "Count and analyze the distribution of [type] nodes"
 
 ## 🔧 Amazon Linux 2023 Troubleshooting
 
@@ -162,6 +246,23 @@ Execution Time: 20-35 seconds
    # Check security group settings
    # Ensure EC2 can access Neptune (port 8182)
    # Ensure browser can access EC2 (port 8501)
+   # Verify security group inbound rules:
+   aws ec2 describe-security-groups --group-ids sg-xxxxxxxxx
+   ```
+
+5. **Bedrock access issues**:
+   ```bash
+   # Test Bedrock access (Claude Sonnet 4 is in us-west-2)
+   aws bedrock list-foundation-models --region us-west-2
+   
+   # Check IAM permissions
+   aws sts get-caller-identity
+   
+   # Test specific Claude Sonnet 4 model access
+   aws bedrock invoke-model --model-id us.anthropic.claude-sonnet-4-20250514-v1:0 --body '{"messages":[{"role":"user","content":"test"}],"max_tokens":10}' --region us-west-2 /tmp/test-output.json
+   
+   # Verify cross-region access works
+   aws bedrock get-foundation-model --model-identifier us.anthropic.claude-sonnet-4-20250514-v1:0 --region us-west-2
    ```
 
 4. **Permission issues**:
