@@ -75,7 +75,7 @@ source .env
 
 # 运行数据处理脚本
 python3 process_lineage.py
-
+```
 
 ### 步骤5: 启动应用
 
