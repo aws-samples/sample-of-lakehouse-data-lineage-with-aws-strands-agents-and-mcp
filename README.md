@@ -75,7 +75,7 @@ source .env
 
 # Run data processing script
 python3 process_lineage.py
-
+```
 
 ### Step 5: Start Application
 
@@ -208,12 +208,6 @@ Execution Time: 45-60 seconds
 2. **Step-by-step Analysis**: For complex scenarios, start with basic analysis then dive into specific issues
 3. **Template Combination**: Combine different expert templates for multi-perspective analysis
 4. **Result Validation**: Validate important analysis results through multiple queries
-
-### 🎯 Query Example Templates
-- **Node Query**: "Analyze all properties and connections of [node-name]"
-- **Path Tracing**: "Trace the complete data flow path from [source-node] to [target-node]"
-- **Impact Analysis**: "If [node/field] changes, which downstream systems would be affected?"
-- **Statistical Analysis**: "Count and analyze the distribution of [type] nodes" through multiple queries
 
 ### 🎯 Query Example Templates
 - **Node Query**: "Analyze all properties and connections of [node-name]"
