@@ -2,7 +2,7 @@
 
 ## 📋 System Overview
 
-The Data Lakehouse lineage analysis system is a data lineage analysis tool based on AWS Neptune graph database, providing natural language interaction interface and supporting professional data lineage analysis and governance recommendations.
+The Data Lakehouse lineage analysis system is a data lineage analysis tool built on AWS Strands Agents and MCP (Model Context Protocol) technology with AWS Neptune graph database, providing natural language interaction interface and delivering professional data lineage analysis, data impact analysis, and data governance recommendations for modern lakehouse architectures.
 
 ### 🎯 Core Features
 - **Sidebar System Prompts**: Collapsible expert role configuration area
