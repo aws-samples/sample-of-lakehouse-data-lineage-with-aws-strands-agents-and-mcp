@@ -1,4 +1,4 @@
-# Lakehouse E2E Data Lineage with AWS Strands Agents and MCP
+# Lakehouse Data Lineage with AWS Strands Agents and MCP
 
 ## 📋 System Overview
 
