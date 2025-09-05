@@ -11,117 +11,89 @@ The Data Lakehouse lineage analysis system is a data lineage analysis tool based
 - **Natural Language Output**: Structured professional analysis reports, non-code output
 - **Real-time Monitoring**: Tool call status and performance statistics
 
-## 📋 Prerequisites and Data Preparation
+## 📋 Prerequisites
 
 ### System Requirements
 - **Operating System**: Amazon Linux 2023 (Recommended)
 - **Python Version**: 3.10+ (Required)
 - **Neptune Instance**: db.r5.large+ (Required)
 - **Network**: VPC access to Neptune
+- **Raw Data**: Lineage data files in `raw-data/` directory
 
-### Data Lineage Preparation
+## 🚀 Complete Setup Guide
 
-Before using this system, you need to prepare data lineage information and write it to the Neptune graph database. Please refer to the following official AWS resources:
-
-#### 📚 Reference Materials
-
-1. **[Exploration and Practice of Building Data Lineage on the Integrated Lake-Warehouse Architecture Based on AWS](https://aws.amazon.com/cn/blogs/china/exploration-and-practice-of-building-data-lineage-on-the-integrated-lake-warehouse-architecture-based-on-aws/)**
-   - Detailed introduction on how to build end-to-end data lineage systems in AWS lakehouse architecture
-
-2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
-   - Building data lineage for complex queries using Amazon Athena, Redshift, Neptune, and dbt
-
-#### 🔧 Data Preparation Steps
-
-1. **Design Graph Schema**
-   - Define vertex types: data sources, datasets, transformation tasks, output tables, etc.
-   - Define edge types: data flow, dependency relationships, transformation relationships, etc.
-
-2. **Data Collection**
-   - Extract lineage information from ETL tools
-   - Parse SQL queries to obtain table-level and column-level dependencies
-   - Collect input-output relationships of data processing jobs
-
-3. **Write to Neptune**
-   - Use Gremlin or SPARQL to write lineage data to Neptune
-   - Establish appropriate indexes to optimize query performance
-   - Validate data integrity and relationship correctness
-
-#### ⚠️ Important Notice
-
-This system is a **data lineage analysis and visualization tool** and does not include data lineage collection and ingestion functionality. Before use, please ensure:
-
-- ✅ Neptune instance is created and configured
-- ✅ Lineage data is written to Neptune according to graph schema
-- ✅ Network connections and permissions are properly configured
-- ✅ Test queries can return lineage relationships normally
-
-## 🚀 Quick Start
-
-### Installation Requirements
-- **Operating System**: Amazon Linux 2023 (Recommended)
-- **Python Version**: 3.10+ (Required)
-- **Neptune Instance**: db.r5.large+ (Required)
-- **Network**: VPC access to Neptune
-
-### Amazon Linux 2023 Fast Installation
-
-#### Step 1: System Update and Python Installation
+### Step 1: System Environment Setup
 ```bash
 # Update system packages
 sudo yum update -y
 
-# Install Python 3.11 (pre-compiled, no compilation needed)
-sudo yum install python3.11 python3.11-pip python3.11-devel -y
+# Install Python 3.11 and required tools
+sudo yum install python3.11 python3.11-pip python3.11-devel git -y
 
-# Verify Python version
+# Verify Python installation
 python3.11 --version  # Should show >= 3.10
-
-# Install Git (if needed)
-sudo yum install git -y
 ```
 
-#### Step 2: Project Deployment
+### Step 2: Project Deployment
 ```bash
 # Clone project
 git clone https://github.com/aws-samples/sample-of-lakehouse-data-lineage-with-aws-strands-agents-and-mcp.git
 cd sample-of-lakehouse-data-lineage-with-aws-strands-agents-and-mcp
 
-# Create virtual environment
+# Create and activate virtual environment
 python3.11 -m venv venv
 source venv/bin/activate
 
-# Upgrade pip and install tools
+# Upgrade pip and install dependencies
 pip install --upgrade pip setuptools wheel
-
-# Install dependencies (use pre-compiled packages, avoid compilation)
 pip install --only-binary=all -r requirements.txt
+
+# Install additional packages for data ingestion
+pip install botocore gremlinpython
 ```
 
-#### Step 3: Environment Configuration
+### Step 3: Environment Configuration
 ```bash
-# Copy environment template
+# Copy and edit environment configuration
 cp .env.example .env
-
-# Edit environment variables (using vi or nano)
 vi .env
 ```
 
-**Environment Configuration Example**:
+**Environment Configuration (.env file)**:
 ```bash
 NEPTUNE_ENDPOINT=neptune-db://your-cluster.cluster-xxxxxx.us-east-1.neptune.amazonaws.com
 AWS_REGION=us-east-1
 AWS_DEFAULT_REGION=us-east-1
+RAW_DATA_PATH=./raw-data
 ```
 
-#### Step 4: Start System
+### Step 4: Data Preparation and Ingestion
+
 ```bash
-# Start application
-streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
+# Load environment variables
+source .env
 
-# Or use startup script
-python run.py
+# Run data processing script
+python3 process_lineage.py
+
+# Verify data ingestion
+python3 -c "from gremlin_python.driver import client; from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection; import os; conn = DriverRemoteConnection(f'wss://{os.getenv('NEPTUNE_ENDPOINT')}:8182/gremlin', 'g'); g = client.Client(conn, 'g'); print('Vertices:', g.V().count().next()); print('Edges:', g.E().count().next()); conn.close()"
 ```
+
+### Step 5: Start Application
+```bash
+# Ensure virtual environment is activated
+source venv/bin/activate
+
+# Start Streamlit application
+streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
+```
+
+### Step 6: Access and Use System
+1. Open browser and navigate to `http://your-server-ip:8501`
+2. Configure system prompts in the sidebar
+3. Select analysis templates and execute queries
+4. View natural language analysis results
 
 ### Usage Workflow
 
@@ -199,52 +171,17 @@ Execution Time: 20-35 seconds
    sudo su - neptune-app
    ```
 
-### Performance Optimization
-```bash
-# Enable pip cache
-export PIP_CACHE_DIR=/tmp/pip-cache
-
-# Use faster mirror source
-pip config set global.index-url https://pypi.org/simple
-```
-
-## 🚀 Production Deployment Recommendations
-
-### EC2 Instance Configuration
-- **Instance Type**: t3.medium or higher
-- **Storage**: At least 20GB EBS
-- **Security Group**: Open port 8501 (Streamlit)
-- **IAM Role**: Neptune access permissions
-
-### System Service Configuration
-```bash
-# Create systemd service file
-sudo tee /etc/systemd/system/neptune-lineage.service > /dev/null <<EOF
-[Unit]
-Description=Neptune Data Lineage Analysis System
-After=network.target
-
-[Service]
-Type=simple
-User=neptune-app
-WorkingDirectory=/home/neptune-app/lakehouse-data-lineage-with-aws-strands-agents-and-mcp
-Environment=PATH=/home/neptune-app/lakehouse-data-lineage-with-aws-strands-agents-and-mcp/venv/bin
-ExecStart=/home/neptune-app/lakehouse-data-lineage-with-aws-strands-agents-and-mcp/venv/bin/streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start service
-sudo systemctl enable neptune-lineage
-sudo systemctl start neptune-lineage
-sudo systemctl status neptune-lineage
-```
-
 ## 📈 Performance Metrics
-- **Installation Time**: 5-10 minutes (vs 30-60 minutes compilation)
+- **Installation Time**: 5-10 minutes
 - **Simple queries**: 5-15 seconds
 - **Medium queries**: 15-30 seconds
 - **Complex queries**: 30-60 seconds
 - **Timeout threshold**: 60 seconds automatic termination
+
+## 📚 Reference Materials
+
+1. **[Exploration and Practice of Building Data Lineage on the Integrated Lake-Warehouse Architecture Based on AWS](https://aws.amazon.com/cn/blogs/china/exploration-and-practice-of-building-data-lineage-on-the-integrated-lake-warehouse-architecture-based-on-aws/)**
+   - Detailed introduction on how to build end-to-end data lineage systems in AWS lakehouse architecture
+
+2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
+   - Building data lineage for complex queries using Amazon Athena, Redshift, Neptune, and dbt
