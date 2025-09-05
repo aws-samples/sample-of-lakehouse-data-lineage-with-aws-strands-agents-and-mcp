@@ -771,40 +771,105 @@ def main():
     """Main entry point"""
     import argparse
     
+    # Load .env file if it exists (for cases where it wasn't loaded at module level)
+    try:
+        from dotenv import load_dotenv
+        env_file = Path('.env')
+        if env_file.exists():
+            load_dotenv(override=True)
+            logger.info(f"Loaded configuration from {env_file.absolute()}")
+    except ImportError:
+        pass
+    
     parser = argparse.ArgumentParser(
         description='Data Lineage Processor with Source Tracking'
     )
+    
+    # Get defaults from environment variables (which now include .env values)
+    default_data_path = os.environ.get('RAW_DATA_PATH', '')
+    default_neptune = os.environ.get('NEPTUNE_ENDPOINT', '')
+    default_region = os.environ.get('AWS_REGION', 'us-east-1')
+    
+    # If RAW_DATA_PATH is not set but we're in a project directory, try to find it
+    if not default_data_path:
+        # Check common locations
+        possible_paths = [
+            Path.cwd() / 'raw-data',
+            Path.cwd() / 'raw_data',
+            Path('/home/ec2-user/raw-data'),
+            Path('/home/ec2-user/lakehouse-e2e-data-lineage-with-aws-strands-agents-and-mcp/raw-data'),
+            Path('/home/ec2-user/sample-of-lakehouse-data-lineage-with-aws-strands-agents-and-mcp/raw-data'),
+        ]
+        for path in possible_paths:
+            if path.exists() and path.is_dir():
+                athena_file = path / 'athena_manifest.json'
+                redshift_file = path / 'redshift_manifest.json'
+                if athena_file.exists() or redshift_file.exists():
+                    default_data_path = str(path)
+                    logger.info(f"Auto-detected data path: {default_data_path}")
+                    break
+    
     parser.add_argument(
         '--data-path',
-        default=os.environ.get('RAW_DATA_PATH', '/home/ec2-user/raw-data'),
+        default=default_data_path,
         help='Path to directory containing manifest files'
     )
     parser.add_argument(
         '--neptune',
-        default=os.environ.get('NEPTUNE_ENDPOINT', ''),
+        default=default_neptune,
         help='Neptune cluster endpoint'
     )
     parser.add_argument(
         '--region',
-        default=os.environ.get('AWS_REGION', 'us-east-1'),
+        default=default_region,
         help='AWS region (default: us-east-1)'
     )
     
     args = parser.parse_args()
     
-    # Validate Neptune endpoint
+    # Show loaded configuration
+    logger.info("\n" + "="*60)
+    logger.info("Configuration:")
+    logger.info("="*60)
+    logger.info(f"  Data Path: {args.data_path or 'NOT SET'}")
+    logger.info(f"  Neptune Endpoint: {args.neptune or 'NOT SET'}")
+    logger.info(f"  AWS Region: {args.region}")
+    
+    # Check environment variables loaded
+    if 'RAW_DATA_PATH' in os.environ:
+        logger.info(f"  RAW_DATA_PATH from env: {os.environ['RAW_DATA_PATH']}")
+    if 'NEPTUNE_ENDPOINT' in os.environ:
+        logger.info(f"  NEPTUNE_ENDPOINT from env: {os.environ['NEPTUNE_ENDPOINT']}")
+    logger.info("="*60 + "\n")
+    
+    # Validate required parameters
+    if not args.data_path:
+        print("\n✗ Error: Data path is required!")
+        print("\nPlease provide it using one of these methods:")
+        print("  1. Create a .env file with: RAW_DATA_PATH=/path/to/raw-data")
+        print("  2. Set environment variable: export RAW_DATA_PATH=/path/to/raw-data")
+        print("  3. Use command line argument: --data-path /path/to/raw-data")
+        sys.exit(1)
+    
     if not args.neptune:
         print("\n✗ Error: Neptune endpoint is required!")
         print("\nPlease provide it using one of these methods:")
-        print("  1. Set environment variable: export NEPTUNE_ENDPOINT=your-cluster.neptune.amazonaws.com")
-        print("  2. Use command line argument: --neptune your-cluster.neptune.amazonaws.com")
+        print("  1. Create a .env file with: NEPTUNE_ENDPOINT=your-cluster.neptune.amazonaws.com")
+        print("  2. Set environment variable: export NEPTUNE_ENDPOINT=your-cluster.neptune.amazonaws.com")
+        print("  3. Use command line argument: --neptune your-cluster.neptune.amazonaws.com")
         sys.exit(1)
     
     # Convert to absolute path if needed
-    data_path = args.data_path
-    if not os.path.isabs(data_path):
-        script_dir = Path(__file__).parent
-        data_path = script_dir / data_path
+    data_path = Path(args.data_path)
+    if not data_path.is_absolute():
+        data_path = Path.cwd() / data_path
+    
+    # Verify data path exists
+    if not data_path.exists():
+        print(f"\n✗ Error: Data path does not exist: {data_path}")
+        print(f"\nCurrent directory: {Path.cwd()}")
+        print("\nPlease check your path and try again.")
+        sys.exit(1)
     
     # Initialize and run processor
     try:
