@@ -11,6 +11,14 @@ Data Lakehouse数据血缘分析系统是一个基于AWS Strands Agents和MCP技
 - **自然语言输出**: 结构化的专业分析报告，非代码输出
 - **实时监控**: 工具调用状态和性能统计
 
+## 📚 参考资料
+
+1. **[在基于 Amazon 云平台的湖仓一体架构上构建数据血缘的探索和实践](https://aws.amazon.com/cn/blogs/china/exploration-and-practice-of-building-data-lineage-on-the-integrated-lake-warehouse-architecture-based-on-aws/)**
+   - 详细介绍如何在AWS湖仓一体架构中构建端到端的数据血缘系统
+
+2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
+   - 使用Amazon Athena、Redshift、Neptune和dbt构建复杂查询的数据血缘
+
 ## 📋 前提条件
 
 ### 系统要求
@@ -273,11 +281,3 @@ streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
 - **中等查询**: 15-30秒
 - **复杂查询**: 30-60秒
 - **超时阈值**: 60秒自动终止
-
-## 📚 参考资料
-
-1. **[在基于 Amazon 云平台的湖仓一体架构上构建数据血缘的探索和实践](https://aws.amazon.com/cn/blogs/china/exploration-and-practice-of-building-data-lineage-on-the-integrated-lake-warehouse-architecture-based-on-aws/)**
-   - 详细介绍如何在AWS湖仓一体架构中构建端到端的数据血缘系统
-
-2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
-   - 使用Amazon Athena、Redshift、Neptune和dbt构建复杂查询的数据血缘
