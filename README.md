@@ -11,6 +11,14 @@ The Data Lakehouse lineage analysis system is a data lineage analysis tool built
 - **Natural Language Output**: Structured professional analysis reports, non-code output
 - **Real-time Monitoring**: Tool call status and performance statistics
 
+## 📚 Reference Materials
+
+1. **[Exploration and Practice of Building Data Lineage on the Integrated Lake-Warehouse Architecture Based on AWS](https://aws.amazon.com/cn/blogs/china/exploration-and-practice-of-building-data-lineage-on-the-integrated-lake-warehouse-architecture-based-on-aws/)**
+   - Detailed introduction on how to build end-to-end data lineage systems in AWS lakehouse architecture
+
+2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
+   - Building data lineage for complex queries using Amazon Athena, Redshift, Neptune, and dbt
+     
 ## 📋 Prerequisites
 
 ### System Requirements
@@ -273,10 +281,4 @@ Execution Time: 45-60 seconds
 - **Complex queries**: 30-60 seconds
 - **Timeout threshold**: 60 seconds automatic termination
 
-## 📚 Reference Materials
 
-1. **[Exploration and Practice of Building Data Lineage on the Integrated Lake-Warehouse Architecture Based on AWS](https://aws.amazon.com/cn/blogs/china/exploration-and-practice-of-building-data-lineage-on-the-integrated-lake-warehouse-architecture-based-on-aws/)**
-   - Detailed introduction on how to build end-to-end data lineage systems in AWS lakehouse architecture
-
-2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
-   - Building data lineage for complex queries using Amazon Athena, Redshift, Neptune, and dbt
