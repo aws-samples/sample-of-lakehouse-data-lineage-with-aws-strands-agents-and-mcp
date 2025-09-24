@@ -73,6 +73,7 @@ NEPTUNE_ENDPOINT=neptune-db://your-cluster.cluster-xxxxxx.us-east-1.neptune.amaz
 AWS_REGION=us-east-1
 AWS_DEFAULT_REGION=us-east-1
 RAW_DATA_PATH=./raw-data
+DASHSCOPE_API_KEY=your qwen-235b api key
 ```
 
 ### 步骤4: 数据准备和导入
@@ -81,9 +82,15 @@ RAW_DATA_PATH=./raw-data
 # 加载环境变量
 source .env
 
-# 运行数据处理脚本
+# 运行table级别的数据处理脚本
+export NEPTUNE_ENDPOINT="your-neptune-endpoint"
 python3 process_lineage.py
+
+# 运行schema级别的数据处理脚本
+export NEPTUNE_ENDPOINT="your-neptune-endpoint"
+python3 process_lineage_qw.py
 ```
+
 
 ### 步骤5: 启动应用
 
@@ -138,7 +145,11 @@ python3 process_lineage.py
 source venv/bin/activate
 
 # 启动Streamlit应用
+#for bedrock claude
 streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
+
+#for qwen 235b
+streamlit run src/app_qw.py --server.port=8501 --server.address=0.0.0.0
 ```
 
 **⚠️ 重要提醒：**
@@ -281,3 +292,4 @@ streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
 - **中等查询**: 15-30秒
 - **复杂查询**: 30-60秒
 - **超时阈值**: 60秒自动终止
+
