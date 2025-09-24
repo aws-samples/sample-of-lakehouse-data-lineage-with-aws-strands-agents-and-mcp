@@ -1,0 +1,284 @@
+{
+  "description": "Data lineage with schema information",
+  "generated_at": "2025-09-24T02:58:07.512193+00:00",
+  "source": "redshift",
+  "lineage": {
+    "staging.monthly_sales": {
+      "downstream": [
+        "analytics.product_performance"
+      ],
+      "schema": {
+        "database": "dev",
+        "schema": "staging",
+        "table": "monthly_sales",
+        "fields": [
+          {
+            "name": "year",
+            "type": "integer",
+            "max_length": null,
+            "precision": 32,
+            "scale": null,
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "month",
+            "type": "integer",
+            "max_length": null,
+            "precision": 32,
+            "scale": null,
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "product_name",
+            "type": "character varying",
+            "max_length": 100,
+            "precision": null,
+            "scale": null,
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "total_quantity",
+            "type": "bigint",
+            "max_length": null,
+            "precision": 64,
+            "scale": null,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "total_revenue",
+            "type": "numeric",
+            "max_length": null,
+            "precision": 12,
+            "scale": 2,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "load_timestamp",
+            "type": "timestamp without time zone",
+            "max_length": null,
+            "precision": null,
+            "scale": null,
+            "nullable": true,
+            "default": "getdate()"
+          },
+          {
+            "name": "source_file",
+            "type": "character varying",
+            "max_length": 500,
+            "precision": null,
+            "scale": null,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "job_run_id",
+            "type": "character varying",
+            "max_length": 100,
+            "precision": null,
+            "scale": null,
+            "nullable": true,
+            "default": null
+          }
+        ],
+        "statistics": {
+          "row_count": 5,
+          "size_mb": 44.0,
+          "unsorted_percent": 0.0,
+          "distribution_style": "KEY(product_name)",
+          "sort_key": "year"
+        },
+        "source": "redshift_catalog",
+        "timestamp": "2025-09-24T02:57:53.435025+00:00"
+      }
+    },
+    "analytics.product_performance": {
+      "downstream": [],
+      "schema": {
+        "database": "dev",
+        "schema": "analytics",
+        "table": "product_performance",
+        "fields": [
+          {
+            "name": "product_name",
+            "type": "character varying",
+            "max_length": 100,
+            "precision": null,
+            "scale": null,
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "year",
+            "type": "integer",
+            "max_length": null,
+            "precision": 32,
+            "scale": null,
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "month",
+            "type": "integer",
+            "max_length": null,
+            "precision": 32,
+            "scale": null,
+            "nullable": false,
+            "default": null
+          },
+          {
+            "name": "total_quantity",
+            "type": "bigint",
+            "max_length": null,
+            "precision": 64,
+            "scale": null,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "total_revenue",
+            "type": "numeric",
+            "max_length": null,
+            "precision": 12,
+            "scale": 2,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "avg_unit_price",
+            "type": "numeric",
+            "max_length": null,
+            "precision": 10,
+            "scale": 2,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "quantity_rank",
+            "type": "integer",
+            "max_length": null,
+            "precision": 32,
+            "scale": null,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "revenue_rank",
+            "type": "integer",
+            "max_length": null,
+            "precision": 32,
+            "scale": null,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "ytd_quantity",
+            "type": "bigint",
+            "max_length": null,
+            "precision": 64,
+            "scale": null,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "ytd_revenue",
+            "type": "numeric",
+            "max_length": null,
+            "precision": 12,
+            "scale": 2,
+            "nullable": true,
+            "default": null
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp without time zone",
+            "max_length": null,
+            "precision": null,
+            "scale": null,
+            "nullable": true,
+            "default": "getdate()"
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp without time zone",
+            "max_length": null,
+            "precision": null,
+            "scale": null,
+            "nullable": true,
+            "default": "getdate()"
+          },
+          {
+            "name": "etl_job_run_id",
+            "type": "character varying",
+            "max_length": 100,
+            "precision": null,
+            "scale": null,
+            "nullable": true,
+            "default": null
+          }
+        ],
+        "statistics": {
+          "row_count": 125,
+          "size_mb": 64.0,
+          "unsorted_percent": 96.0,
+          "distribution_style": "KEY(product_name)",
+          "sort_key": "year"
+        },
+        "source": "redshift_catalog",
+        "timestamp": "2025-09-24T02:57:48.956552+00:00"
+      }
+    },
+    "staging.temp_parquet_data": {
+      "downstream": [
+        "staging.monthly_sales"
+      ],
+      "schema": {
+        "database": "dev",
+        "schema": "staging",
+        "table": "temp_parquet_data",
+        "fields": [
+          {
+            "name": "year",
+            "type": "INTEGER",
+            "nullable": true,
+            "default": null
+          }
+        ],
+        "source": "ddl_parse",
+        "timestamp": "2025-09-24T02:58:00.564303+00:00"
+      }
+    },
+    "s3://sales-forecast-demo-new/monthly-summary": {
+      "downstream": [
+        "staging.temp_parquet_data"
+      ],
+      "schema": {}
+    }
+  },
+  "column_lineage": {},
+  "statistics": {
+    "total_datasets": 4,
+    "s3_sources": 1,
+    "tables": 3,
+    "tables_with_schema": 3,
+    "column_lineages": 0
+  },
+  "parsing_info": {
+    "openlineage_sql_available": false,
+    "parsing_stats": {
+      "total_queries": 20,
+      "sql_parser_success": 0,
+      "sql_parser_failure": 0,
+      "regex_parsing": 20,
+      "copy_operations": 1,
+      "insert_operations": 3,
+      "ctas_operations": 0,
+      "unload_operations": 0,
+      "column_mappings_found": 0
+    }
+  }
+}

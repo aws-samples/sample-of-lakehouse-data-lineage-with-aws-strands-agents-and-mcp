@@ -1,0 +1,491 @@
+{
+  "description": "数据血缘上下游关系（包含schema信息）",
+  "generated_at": "2025-09-24T02:54:42.591090+00:00",
+  "source": "glue",
+  "lineage": {
+    "s3://sales-forecast-demo-new/monthly-summary": {
+      "downstream": [
+        "s3://sales-forecast-demo-new/analytics-results/business_insights",
+        "s3://sales-forecast-demo-new/analytics-results/executive_summary",
+        "s3://sales-forecast-demo-new/analytics-results/monthly_growth",
+        "s3://sales-forecast-demo-new/analytics-results/product_lifecycle",
+        "s3://sales-forecast-demo-new/analytics-results/product_performance",
+        "s3://sales-forecast-demo-new/analytics-results/quarterly_summary",
+        "s3://sales-forecast-demo-new/analytics-results/yearly_trends"
+      ],
+      "schema": {
+        "fields": [
+          {
+            "name": "year",
+            "type": "integer"
+          },
+          {
+            "name": "month",
+            "type": "integer"
+          },
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "total_quantity",
+            "type": "long"
+          },
+          {
+            "name": "total_revenue",
+            "type": "double"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:42:16.848Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/raw-data/sales_data.csv": {
+      "downstream": [
+        "s3://sales-forecast-demo-new/cleaned-data",
+        "s3://sales-forecast-demo-new/quality-reports"
+      ],
+      "schema": {
+        "fields": [
+          {
+            "name": "date",
+            "type": "string"
+          },
+          {
+            "name": "product_id",
+            "type": "string"
+          },
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "price",
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "type": "string"
+          },
+          {
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "name": "store_id",
+            "type": "string"
+          },
+          {
+            "name": "promotion",
+            "type": "string"
+          }
+        ],
+        "source": "openlineage_input",
+        "timestamp": "2025-09-24T02:40:36.775Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/cleaned-data": {
+      "downstream": [
+        "s3://sales-forecast-demo-new/monthly-summary"
+      ],
+      "schema": {
+        "fields": [
+          {
+            "name": "date",
+            "type": "string"
+          },
+          {
+            "name": "product_id",
+            "type": "string"
+          },
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "price",
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "type": "string"
+          },
+          {
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "name": "store_id",
+            "type": "string"
+          },
+          {
+            "name": "promotion",
+            "type": "string"
+          }
+        ],
+        "source": "openlineage_input",
+        "timestamp": "2025-09-24T02:42:16.848Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/analytics-results/quarterly_summary": {
+      "downstream": [],
+      "schema": {
+        "fields": [
+          {
+            "name": "year",
+            "type": "integer"
+          },
+          {
+            "name": "quarter",
+            "type": "integer"
+          },
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "quarterly_quantity",
+            "type": "long"
+          },
+          {
+            "name": "quarterly_revenue",
+            "type": "double"
+          },
+          {
+            "name": "avg_monthly_revenue_in_quarter",
+            "type": "double"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:43:25.85Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/analytics-results/product_lifecycle": {
+      "downstream": [],
+      "schema": {
+        "fields": [
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "trend_history",
+            "type": "array",
+            "fields": [
+              {
+                "name": "_element",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "avg_growth_rate",
+            "type": "double"
+          },
+          {
+            "name": "growth_volatility",
+            "type": "double"
+          },
+          {
+            "name": "current_trend",
+            "type": "string"
+          },
+          {
+            "name": "lifecycle_stage",
+            "type": "string"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:43:30.094Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/analytics-results/product_performance": {
+      "downstream": [],
+      "schema": {
+        "fields": [
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "lifetime_quantity",
+            "type": "long"
+          },
+          {
+            "name": "lifetime_revenue",
+            "type": "double"
+          },
+          {
+            "name": "avg_monthly_revenue",
+            "type": "double"
+          },
+          {
+            "name": "months_active",
+            "type": "long"
+          },
+          {
+            "name": "first_sale_month",
+            "type": "string"
+          },
+          {
+            "name": "last_sale_month",
+            "type": "string"
+          },
+          {
+            "name": "revenue_rank",
+            "type": "integer"
+          },
+          {
+            "name": "quantity_rank",
+            "type": "integer"
+          },
+          {
+            "name": "avg_price",
+            "type": "double"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:43:23.479Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/analytics-results/executive_summary": {
+      "downstream": [],
+      "schema": {
+        "fields": [
+          {
+            "name": "declining_products",
+            "type": "long"
+          },
+          {
+            "name": "growth_products",
+            "type": "long"
+          },
+          {
+            "name": "mature_products",
+            "type": "long"
+          },
+          {
+            "name": "report_date",
+            "type": "string"
+          },
+          {
+            "name": "star_products",
+            "type": "long"
+          },
+          {
+            "name": "top_quantity_product",
+            "type": "string"
+          },
+          {
+            "name": "top_revenue_product",
+            "type": "string"
+          },
+          {
+            "name": "total_products_analyzed",
+            "type": "long"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:43:54.518Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/analytics-results/business_insights": {
+      "downstream": [],
+      "schema": {
+        "fields": [
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "lifetime_revenue",
+            "type": "double"
+          },
+          {
+            "name": "lifetime_quantity",
+            "type": "long"
+          },
+          {
+            "name": "avg_price",
+            "type": "double"
+          },
+          {
+            "name": "revenue_rank",
+            "type": "integer"
+          },
+          {
+            "name": "quantity_rank",
+            "type": "integer"
+          },
+          {
+            "name": "months_active",
+            "type": "long"
+          },
+          {
+            "name": "lifecycle_stage",
+            "type": "string"
+          },
+          {
+            "name": "avg_growth_rate",
+            "type": "double"
+          },
+          {
+            "name": "performance_category",
+            "type": "string"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:43:32.764Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/analytics-results/monthly_growth": {
+      "downstream": [],
+      "schema": {
+        "fields": [
+          {
+            "name": "year",
+            "type": "integer"
+          },
+          {
+            "name": "month",
+            "type": "integer"
+          },
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "total_quantity",
+            "type": "long"
+          },
+          {
+            "name": "total_revenue",
+            "type": "double"
+          },
+          {
+            "name": "prev_revenue",
+            "type": "double"
+          },
+          {
+            "name": "prev_quantity",
+            "type": "long"
+          },
+          {
+            "name": "revenue_growth_rate",
+            "type": "double"
+          },
+          {
+            "name": "quantity_growth_rate",
+            "type": "double"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:43:25.018Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/analytics-results/yearly_trends": {
+      "downstream": [],
+      "schema": {
+        "fields": [
+          {
+            "name": "year",
+            "type": "integer"
+          },
+          {
+            "name": "product_name",
+            "type": "string"
+          },
+          {
+            "name": "yearly_quantity",
+            "type": "long"
+          },
+          {
+            "name": "yearly_revenue",
+            "type": "double"
+          },
+          {
+            "name": "avg_monthly_revenue",
+            "type": "double"
+          },
+          {
+            "name": "revenue_volatility",
+            "type": "double"
+          },
+          {
+            "name": "best_month_revenue",
+            "type": "double"
+          },
+          {
+            "name": "worst_month_revenue",
+            "type": "double"
+          },
+          {
+            "name": "prev_year_revenue",
+            "type": "double"
+          },
+          {
+            "name": "yoy_growth_rate",
+            "type": "double"
+          },
+          {
+            "name": "revenue_stability",
+            "type": "double"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:43:28.43Z"
+      }
+    },
+    "s3://sales-forecast-demo-new/quality-reports": {
+      "downstream": [],
+      "schema": {
+        "fields": [
+          {
+            "name": "metric_type",
+            "type": "string"
+          },
+          {
+            "name": "column",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "double"
+          },
+          {
+            "name": "percentage",
+            "type": "double"
+          },
+          {
+            "name": "check_time",
+            "type": "string"
+          },
+          {
+            "name": "rule",
+            "type": "string"
+          },
+          {
+            "name": "statistic",
+            "type": "string"
+          }
+        ],
+        "source": "openlineage_output",
+        "timestamp": "2025-09-24T02:40:50.091Z"
+      }
+    }
+  },
+  "column_lineage": {},
+  "statistics": {
+    "total_datasets": 11,
+    "datasets_with_schema": 11,
+    "column_lineages": 0
+  }
+}
