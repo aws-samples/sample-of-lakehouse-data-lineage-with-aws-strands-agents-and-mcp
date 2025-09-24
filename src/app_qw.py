@@ -157,19 +157,19 @@ def create_enhanced_claude_agent(system_prompt, mcp_client):
                 self.tool_call_log = []
             
             def call_mcp_tool(self, tool_name, arguments=None):
-                """Call MCP tool and log the process like Claude does"""
+                """Call MCP tool and log the process - backend logging + sidebar monitoring"""
                 try:
+                    # Backend logging
                     self.tool_call_log.append(f"调用工具: {tool_name}")
                     if arguments:
                         self.tool_call_log.append(f"参数: {arguments}")
                     
-                    # Add tool call record
-                    call_record = {
+                    # Sidebar monitoring - add to session state
+                    st.session_state.tool_calls.append({
                         'tool': tool_name,
                         'status': 'running',
                         'timestamp': datetime.now().strftime('%H:%M:%S')
-                    }
-                    st.session_state.tool_calls.append(call_record)
+                    })
                     
                     result = self.mcp_client.call_tool_sync(
                         tool_use_id=str(uuid.uuid4()),
@@ -179,7 +179,9 @@ def create_enhanced_claude_agent(system_prompt, mcp_client):
                     
                     if result.get('status') == 'success':
                         self.tool_call_log.append(f"调用状态: 成功")
-                        call_record['status'] = 'success'
+                        # Update sidebar status
+                        st.session_state.tool_calls[-1]['status'] = 'success'
+                        
                         if result.get('content'):
                             content = result['content'][0].get('text', '{}')
                             try:
@@ -188,12 +190,15 @@ def create_enhanced_claude_agent(system_prompt, mcp_client):
                                 return content
                     else:
                         self.tool_call_log.append(f"调用状态: 失败 - {result}")
-                        call_record['status'] = 'error'
+                        # Update sidebar status
+                        st.session_state.tool_calls[-1]['status'] = 'error'
                         return None
                         
                 except Exception as e:
                     self.tool_call_log.append(f"调用异常: {str(e)}")
-                    call_record['status'] = 'error'
+                    # Update sidebar status
+                    if st.session_state.tool_calls:
+                        st.session_state.tool_calls[-1]['status'] = 'error'
                     return None
             
             def execute_comprehensive_analysis(self, user_instruction):
@@ -374,32 +379,23 @@ def create_enhanced_claude_agent(system_prompt, mcp_client):
                     # Execute comprehensive analysis
                     analysis_data = self.execute_comprehensive_analysis(user_message)
                     
-                    # For connection check and graph overview, return simple formatted results
+                    # For connection check and graph overview, return simple formatted results without MCP process
                     if "连接状态检查" in instruction_lower:
-                        return f"""### 🔍 MCP工具调用过程
-{chr(10).join(self.tool_call_log)}
-
-### 📊 连接状态检查结果
+                        return f"""### 📊 连接状态检查结果
 {json.dumps(analysis_data, ensure_ascii=False, indent=2)}
 
 ### 📋 总结
-已成功检查Neptune图数据库连接状态，仅执行了get_graph_status工具调用。"""
+已成功检查Neptune图数据库连接状态。"""
                     
                     if "图模式概览" in instruction_lower:
-                        return f"""### 🔍 MCP工具调用过程
-{chr(10).join(self.tool_call_log)}
-
-### 📊 图模式概览结果
+                        return f"""### 📊 图模式概览结果
 {json.dumps(analysis_data, ensure_ascii=False, indent=2)}
 
 ### 📋 总结
-已成功获取图数据库基本模式信息，仅执行了get_graph_status和get_graph_schema工具调用。"""
+已成功获取图数据库基本模式信息。"""
                     
-                    # For other scenarios, use full AI analysis
-                    analysis_prompt = f"""基于以下MCP工具调用结果，生成专业的数据血缘分析报告：
-
-## MCP工具调用过程
-{chr(10).join(self.tool_call_log)}
+                    # For other scenarios, use full AI analysis without showing MCP process in frontend
+                    analysis_prompt = f"""基于以下查询结果数据，生成专业的数据血缘分析报告：
 
 ## 用户需求
 {user_message}
@@ -408,10 +404,6 @@ def create_enhanced_claude_agent(system_prompt, mcp_client):
 {json.dumps(analysis_data, ensure_ascii=False, indent=2)}
 
 请按照以下格式生成分析报告：
-
-### 🔍 MCP工具调用过程
-- 详细显示每个工具的调用步骤和参数
-- 标注查询命令的具体内容
 
 ### 📊 关键统计信息
 - 数据集总数和类型分布
@@ -432,7 +424,7 @@ def create_enhanced_claude_agent(system_prompt, mcp_client):
 - 提供简洁的结论
 - 给出可操作的建议
 
-请使用中文回复，确保分析的准确性和专业性。"""
+请使用中文回复，确保分析的准确性和专业性。不要在分析结果中显示MCP工具调用过程。"""
                     
                     # Call Qwen3-235B
                     response = self.qwen_client.chat.completions.create(
@@ -556,12 +548,12 @@ def main():
     
     # Updated instruction templates based on Claude's scenarios
     instruction_templates = {
-        "数据源统计": "统计图中的数据源数量和类型，同时显示出调用的MCP tool的相关过程",
-        "数据血缘追踪": "追踪从原始数据到最终分析结果的完整路径，同时显示出调用的MCP tool的完整的相关过程",
-        "关键枢纽节点识别": "识别关键的数据枢纽节点，同时显示出调用的MCP tool的相关过程",
-        "数据源影响范围评估": "评估核心数据源的影响范围，同时显示出调用的MCP tool的完整的相关过程",
-        "字段级影响分析": "如果raw-data/sales_data.csv的date发生变更，会影响哪些下游系统的哪些字段.同时显示出调用的MCP tool的完整的相关过程。如果有执行MCP tool查询的相关命令，请同时打印出相关的命令。",
-        "数据治理建议": "基于数据血缘分析，提供数据治理建议，同时显示出调用的MCP tool的完整的相关过程",
+        "数据源统计": "统计图中的数据源数量和类型",
+        "数据血缘追踪": "追踪从原始数据到最终分析结果的完整路径",
+        "关键枢纽节点识别": "识别关键的数据枢纽节点",
+        "数据源影响范围评估": "评估核心数据源的影响范围",
+        "字段级影响分析": "如果raw-data/sales_data.csv的date发生变更，会影响哪些下游系统的哪些字段.",
+        "数据治理建议": "基于数据血缘分析，提供数据治理建议",
         "完整血缘分析报告": "生成完整的数据血缘分析报告，包括执行摘要、数据架构概览、关键发现和洞察、风险评估、改进建议"
     }
     
