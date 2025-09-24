@@ -2,7 +2,7 @@
 
 ## 📋 System Overview
 
-The Data Lakehouse lineage analysis system is a data lineage analysis tool built on AWS Strands Agents and MCP (Model Context Protocol) technology with AWS Neptune graph database, providing natural language interaction interface and delivering professional data lineage analysis, data impact analysis, and data governance recommendations for modern lakehouse architectures.
+The Data Lakehouse data lineage analysis system is a data lineage analysis tool built on AWS Strands Agents and MCP technology with AWS Neptune graph database, providing natural language interaction interface and delivering professional data lineage analysis, data impact analysis, and data governance recommendations for modern lakehouse architectures.
 
 ### 🎯 Core Features
 - **Sidebar System Prompts**: Collapsible expert role configuration area
@@ -18,7 +18,7 @@ The Data Lakehouse lineage analysis system is a data lineage analysis tool built
 
 2. **[Building end-to-end data lineage for one-time and complex queries using Amazon Athena, Amazon Redshift, Amazon Neptune and dbt](https://aws.amazon.com/cn/blogs/big-data/building-end-to-end-data-lineage-for-one-time-and-complex-queries-using-amazon-athena-amazon-redshift-amazon-neptune-and-dbt/)**
    - Building data lineage for complex queries using Amazon Athena, Redshift, Neptune, and dbt
-     
+
 ## 📋 Prerequisites
 
 ### System Requirements
@@ -69,10 +69,11 @@ vi .env
 
 **Environment Configuration (.env file)**:
 ```bash
-NEPTUNE_ENDPOINT=neptune-db://your-cluster.cluster-xxxxxx.us-west-2.neptune.amazonaws.com
-AWS_REGION=us-west-2
-AWS_DEFAULT_REGION=us-west-2
+NEPTUNE_ENDPOINT=neptune-db://your-cluster.cluster-xxxxxx.us-east-1.neptune.amazonaws.com
+AWS_REGION=us-east-1
+AWS_DEFAULT_REGION=us-east-1
 RAW_DATA_PATH=./raw-data
+DASHSCOPE_API_KEY=your qwen-235b api key
 ```
 
 ### Step 4: Data Preparation and Ingestion
@@ -81,8 +82,13 @@ RAW_DATA_PATH=./raw-data
 # Load environment variables
 source .env
 
-# Run data processing script
+# Run table-level data processing script
+export NEPTUNE_ENDPOINT="your-neptune-endpoint"
 python3 process_lineage.py
+
+# Run schema-level data processing script
+export NEPTUNE_ENDPOINT="your-neptune-endpoint"
+python3 process_lineage_qw.py
 ```
 
 ### Step 5: Start Application
@@ -138,7 +144,11 @@ python3 process_lineage.py
 source venv/bin/activate
 
 # Start Streamlit application
+# For Bedrock Claude
 streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
+
+# For Qwen 235B
+streamlit run src/app_qw.py --server.port=8501 --server.address=0.0.0.0
 ```
 
 **⚠️ Important Notes:**
@@ -160,7 +170,7 @@ streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
 - Available templates: Data Lineage Expert, S3 Data Source Expert, Data Impact Expert, etc.
 
 #### Step 2: Set Analysis Instructions (Main Area)
-- Select analysis templates: Connection Check, Data Source Statistics, Simple Lineage Analysis, etc.
+- Select analysis templates: Connection Status Check, Data Source Statistics, Simple Lineage Analysis, etc.
 - Click "📋 Use Template" or manually edit instruction content
 
 #### Step 3: Execute Analysis
@@ -254,6 +264,33 @@ Execution Time: 45-60 seconds
 
 5. **Bedrock access issues**:
    ```bash
+   # Test Bedrock access (Claude Sonnet 4 in us-west-2 region)
+   aws bedrock list-foundation-models --region us-west-2
+   
+   # Check IAM permissions
+   aws sts get-caller-identity
+   
+   # Test specific Claude Sonnet 4 model access
+   aws bedrock invoke-model --model-id us.anthropic.claude-sonnet-4-20250514-v1:0 --body '{"messages":[{"role":"user","content":"test"}],"max_tokens":10}' --region us-west-2 /tmp/test-output.json
+   
+   # Verify cross-region access works normally
+   aws bedrock get-foundation-model --model-identifier us.anthropic.claude-sonnet-4-20250514-v1:0 --region us-west-2
+   ```
+
+4. **Permission issues**:
+   ```bash
+   # Create dedicated user for application
+   sudo useradd -m neptune-app
+   sudo su - neptune-app
+   ```
+
+## 📈 Performance Metrics
+- **Installation time**: 5-10 minutes
+- **Simple queries**: 5-15 seconds
+- **Medium queries**: 15-30 seconds
+- **Complex queries**: 30-60 seconds
+- **Timeout threshold**: 60 seconds automatic termination issues**:
+   ```bash
    # Test Bedrock access (Claude Sonnet 4 is in us-west-2)
    aws bedrock list-foundation-models --region us-west-2
    
@@ -280,5 +317,4 @@ Execution Time: 45-60 seconds
 - **Medium queries**: 15-30 seconds
 - **Complex queries**: 30-60 seconds
 - **Timeout threshold**: 60 seconds automatic termination
-
 
