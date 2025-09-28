@@ -73,7 +73,6 @@ NEPTUNE_ENDPOINT=neptune-db://your-cluster.cluster-xxxxxx.us-east-1.neptune.amaz
 AWS_REGION=us-east-1
 AWS_DEFAULT_REGION=us-east-1
 RAW_DATA_PATH=./raw-data
-DASHSCOPE_API_KEY=your qwen-235b api key
 ```
 
 ### 步骤4: 数据准备和导入
